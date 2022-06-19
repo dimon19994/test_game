@@ -8,6 +8,8 @@ from models.tables import User, Token
 
 class RegistrationController(_Controller):
     def _post(self):
+        print(self.request.data)
+        print(self.request.json if self.request.is_json else "XYZ")
         user_name = self.request.form["userName"]
         password = self.request.form["password"]
         password_confirm = self.request.form["passwordConfirm"]
