@@ -13,6 +13,6 @@ login_manager.init_app(app)
 app.config.from_object('config')
 app.config["SECRET_KEY"] = "test_key"
 socket_io = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
-CORS(app)
+CORS(socket_io)
 
 import blueprints
