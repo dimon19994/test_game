@@ -8,11 +8,9 @@ from models.tables import User, Token
 
 class RegistrationController(_Controller):
     def _post(self):
-        print(self.request.data)
-        print(self.request.json if self.request.is_json else "XYZ")
-        user_name = self.request.form["userName"]
-        password = self.request.form["password"]
-        password_confirm = self.request.form["passwordConfirm"]
+        user_name = self.request.json["userName"]
+        password = self.request.json["password"]
+        password_confirm = self.request.json["passwordConfirm"]
 
         user = User.get_or_none(User.username == user_name)
 
@@ -27,9 +25,9 @@ class RegistrationController(_Controller):
 
 class LoginController(_Controller):
     def _post(self):
-        user_name = self.request.form.get("userName")
-        password = self.request.form.get("password")
-        token = self.request.form.get("token")
+        user_name = self.request.json.get("userName")
+        password = self.request.json.get("password")
+        token = self.request.json.get("token")
 
         if token is not None:
             user = User.select().join(Token, JOIN.LEFT_OUTER).where(Token.token == token).first()
