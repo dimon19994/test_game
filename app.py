@@ -16,3 +16,4 @@ socket_io = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger
 CORS(app)
 
 import blueprints
+from blueprints.game import *

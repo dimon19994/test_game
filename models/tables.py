@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from peewee import CharField, ForeignKeyField
+from peewee import CharField, ForeignKeyField, IntegerField
 
 from models import _Model
 
@@ -18,3 +18,21 @@ class Token(_Model):
 
     token = CharField(primary_key=True)
     user_id = ForeignKeyField(User)
+
+
+class Room(_Model):
+    class Meta:
+        db_table = "rooms"
+
+    name = CharField()
+    max_players = IntegerField()
+    players_count = IntegerField()
+    creator = ForeignKeyField(User)
+
+
+class UsersInRoom(_Model):
+    class Meta:
+        db_table = "users_in_room"
+
+    user_id = ForeignKeyField(User)
+    room_id = ForeignKeyField(Room)

@@ -1,29 +1,25 @@
 from peewee import JOIN
 from uuid import uuid4
-from flask_login import login_user
+from flask_login import login_user, current_user
 
 from controllers import _Controller
-from models.tables import User, Token
+from models.tables import Room, UsersInRoom
 
 
-class RegistrationController(_Controller):
+class CreateRoomController(_Controller):
     def _post(self):
-        user_name = self.request.json["userName"]
-        password = self.request.json["password"]
-        password_confirm = self.request.json["passwordConfirm"]
+        creator = self.request.json["creatorId"]
+        room_name = self.request.json["roomTitle"]
+        max_players = self.request.json["playersCount"]
 
-        user = User.get_or_none(User.username == user_name)
+        room = Room.create(name=room_name, max_players=max_players, creator=creator)
+        UsersInRoom.create(room_id=room, user_id=current_user)
 
-        if user is not None:
-            return {"status": 'Exist'}
-        elif password != password_confirm:
-            return {"status": 'Not match'}
-        else:
-            User.create(username=user_name, password=password)
-            return {"status": 'Ok'}
+        return {"status": 'Ok'}
 
 
-class LoginController(_Controller):
+
+class RoomListController(_Controller):
     def _post(self):
         user_name = self.request.json.get("userName")
         password = self.request.json.get("password")

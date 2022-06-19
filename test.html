@@ -1,0 +1,97 @@
+<!-- static/index.html  -->
+
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Socket.IO Example</title>
+</head>
+
+<body>
+<p id="gameRoom"></p>
+
+<form id="joinForm">
+    <input id="usernameInput" type="text" placeholder="Your Name" autocomplete="off" required>
+    <input id="roomInput" type="text" placeholder="Room ID" autocomplete="off" required>
+    <button id="joinGameSubmitButton" type="submit" btn btn-dark
+    ">Join Room</button>
+</form>
+
+<button id="collectColorsButton" style="display: none;">Collect Colors</button>
+
+<form id="colorForm" style="display: none;">
+    <p>Please select a color.</p>
+    <input id="colorInput" type="color" required>
+    <button id="colorSubmitButton" type="submit">Send Color</button>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+        integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+        crossorigin="anonymous"></script>
+<script src="client.js"></script>
+</body>
+<script>
+    // static/client.js
+
+    var socket = io.connect("192.168.1.2:25565");
+
+    var username = null;
+    var room = null;
+    var joined = false;
+    var colorCallback = null;
+
+    function joinedRoom(success) {
+        if (success) {
+            joined = true;
+            $("#joinForm").hide();
+            $("#collectColorsButton").show();
+            $("#gameRoom").text(`Room: ${room}`);
+        }
+    }
+
+    socket.on("connect", () => {
+        console.log("You are connected to the server.");
+    });
+
+    socket.on("connect_error", (data) => {
+        console.log(`Unable to connect to the server: ${data}.`);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("You have been disconnected from the server.");
+    });
+
+    socket.on("message", (data) => {
+        console.log(data);
+    });
+
+    socket.on("send color", (data, callback) => {
+        $("#collectColorsButton").hide();
+        $("#colorForm").show();
+        console.log(`Callback set to ${callback}`);
+        colorCallback = callback;
+    });
+
+    $("#joinForm").on("submit", (event) => {
+        event.preventDefault();
+        username = $("#usernameInput").val();
+        room = $("#roomInput").val()
+        socket.emit("join", {username: username, room: room}, joinedRoom);
+    });
+
+    $("#colorForm").on("submit", (event) => {
+        event.preventDefault();
+        var color = $("#colorInput").val();
+        $("#colorForm").hide();
+        colorCallback(color);
+    });
+
+    $("#collectColorsButton").on("click", () => {
+        socket.emit("collect colors", {username: username, room: room});
+    });
+</script>
+</html>
